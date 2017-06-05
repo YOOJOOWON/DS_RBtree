@@ -49,18 +49,7 @@ class BST {
         z.color = RED;
         insert_fixup(z);
     }
-
-    int black_height () {
-        int level = 0;
-        Node n = root;
-        while (n != nil) {
-            if (n.color == BLACK)
-                level++;
-            n = n.right;
-        }
-        return level;
-    }
-
+    
     public void insert_fixup(Node z) {
         while (z.parent.color == RED) {
             Node y = nil;
@@ -296,6 +285,27 @@ class BST {
         if (tree.left != nil)
             print(tree.left, level + 1);
     }
+    
+    public void inorder(Node tree) {
+        if (tree == nil)
+            return;
+        else {
+            inorder(tree.left);
+            System.out.println(tree.val);
+            inorder(tree.right);
+        }
+    }
+    
+    int black_height () {
+        int level = 0;
+        Node n = root;
+        while (n != nil) {
+            if (n.color == BLACK)
+                level++;
+            n = n.right;
+        }
+        return level;
+    } // calculate bh
 
     void numbering (Node tree) {
         if (tree == root) {
@@ -311,17 +321,7 @@ class BST {
                 nb++;
             numbering(tree.right);
         }
-    }
-
-    public void inorder(Node tree) {
-        if (tree == nil)
-            return;
-        else {
-            inorder(tree.left);
-            System.out.println(tree.val);
-            inorder(tree.right);
-        }
-    }
+    } // calculate total & nb
 }
 
 public class DataStructure {

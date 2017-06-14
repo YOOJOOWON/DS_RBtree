@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -9,8 +10,11 @@ class BST {
 
     public Node root = nil;
 
-    int total;
-    int nb;
+    int total = 0;
+    int nb = 0;
+    int hit = 0;
+    int delete = 0;
+    int miss = 0;
 
     class Node {
         public int val;
@@ -48,6 +52,7 @@ class BST {
         z.right = nil;
         z.color = RED;
         insert_fixup(z);
+        hit++;
     }
     
     public void insert_fixup(Node z) {
@@ -163,7 +168,10 @@ class BST {
 
     public void delete (Node tree, int n) {
         Node z;
-        if((z = search(root, n))==null) return;
+        if((z = search(root, n))==null) {
+        	miss++;
+        	return;
+        }
         Node x;
         Node y = z;
         boolean y_original_color = y.color;
@@ -192,6 +200,7 @@ class BST {
         }
         if(y_original_color==BLACK)
             delete_fixup(x);
+        delete++;
         return;
     }
 
@@ -291,7 +300,12 @@ class BST {
             return;
         else {
             inorder(tree.left);
-            System.out.println(tree.val);
+            System.out.print(tree.val + " ");
+            if  (tree.color == true)
+            	System.out.print("R");
+            else            	        	
+                System.out.print("B");
+            System.out.println();
             inorder(tree.right);
         }
     }
@@ -326,31 +340,45 @@ class BST {
 
 public class DataStructure {
     public static void main(String [] args) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(".\\input.txt"));
-        BST bst = new BST();
-        int l;
+    	File dir = new File("./input/");
+    	File[] fileList = dir.listFiles();
+    	
+    	try{
+    		for (int i = 0; i < fileList.length; i++){
+    			File file = fileList[i];
+    			if (file.isFile()){
+    				System.out.println("filename = " + file.getName());
+    		        BufferedReader br = new BufferedReader(new FileReader(file));
+    		        BST bst = new BST();
+    		        int l;
+    		        while (true) {
+    		            String line = br.readLine();
+    		            line = onlyNum(line);
+    		            l = Integer.parseInt(line);
+    		            if (l > 0)
+    		                bst.insert(bst.root, l);
+    		            else if (l < 0){
+    		                l = Math.abs(l);
+    		                bst.delete(bst.root, l);
+    		            }
+    		            else if (l == 0)
+    		                break;
+    		        }
+    		        bst.numbering(bst.root);
 
-        while (true) {
-            String line = br.readLine();
-            line = onlyNum(line);
-            l = Integer.parseInt(line);
-            if (l > 0)
-                bst.insert(bst.root, l);
-            else if (l < 0){
-                l = Math.abs(l);
-                bst.delete(bst.root, l);
-            }
-            else if (l == 0)
-                break;
-        }
+    		        System.out.println("total = " + bst.total);
+    		        System.out.println("insert = " + bst.hit);
+    		        System.out.println("deleted = " + bst.delete);
+    		        System.out.println("miss = " + bst.miss);
+    		        System.out.println("nb = " + bst.nb);
+    		        System.out.println("bh = " + bst.black_height());
+    		        bst.inorder(bst.root);
+    		        System.out.println();
+    			}
+    		}
+    	} catch(IOException e){    	
+    	}
 
-        bst.numbering(bst.root);
-
-        System.out.println("total = " + bst.total);
-        System.out.println("nb = " + bst.nb);
-        System.out.println("bh = " + bst.black_height());
-        bst.inorder(bst.root);
-        System.out.println();
     }
 
     public static String onlyNum(String str) {

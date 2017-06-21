@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 class BST {
     private final boolean RED = true;
@@ -165,10 +166,17 @@ class BST {
             tree = tree.left;
         return tree;
     }
+    
+    Node max_value(Node tree){
+        while (tree.right != nil)
+            tree = tree.right;
+        return tree;
+    }
+
 
     public void delete (Node tree, int n) {
         Node z;
-        if((z = search(root, n))==null) {
+        if((z = search(root, n))==nil) {
         	miss++;
         	return;
         }
@@ -263,9 +271,9 @@ class BST {
         x.color = BLACK;
     }
 
-    public Node search (Node tree, int val) {
+    Node search (Node tree, int val) {
         if (tree == nil)
-            return null;
+            return nil;
 
         if (val == tree.val)
             return tree;
@@ -277,8 +285,75 @@ class BST {
             if (tree.right != nil)
                 return search(tree.right, val);
         }
-        return null;
+        return nil;
     }
+    
+
+    Node predecessor (Node tree) {
+    	if (tree.left != nil){
+    		return max_value(tree.left);
+    	}
+    	Node temp = tree.parent;
+    	while (temp != nil && tree == temp.left){
+    		tree = temp;
+    		temp = temp.parent;
+    	}
+    	return temp;
+    }
+    
+    Node succesor (Node tree) {
+    	if (tree.right != nil){
+    		return min_value(tree.right);
+    	}
+    	Node temp = tree.parent;
+    	while (temp != nil && tree == temp.right){
+    		tree = temp;
+    		temp = temp.parent;
+    	}
+    	return temp;
+    }
+    
+
+    public void search_three (Node tree, int val, PrintWriter output) {
+    	int a1 = 0, a2 = 0, a3 = 0;
+        
+    	Node y = nil;
+    	Node x = tree;
+    	    	
+    	while (x != nil){
+    		y = x;
+    		if (val < x.val)
+    			x = x.left;
+    		else if (val > x.val)
+    			x = x.right;
+    		else
+    			break;
+    	}
+    	if (y.val == val){
+    		a1 = predecessor(y).val;
+    		a2 = y.val;
+        	a3 = succesor(y).val;
+        }
+    	else if (y.val > val){
+    		a1 = predecessor(y).val;
+    		a2 = -1;
+    		a3 = y.val;
+    	}
+    	else if (y.val < val){
+    		a1 = y.val;
+    		a2 = -1;
+    		a3 = succesor(y).val;
+    	}
+    	
+    	output.print(((a1 == -1)? "NIL" : a1) + " ");
+    	output.print(((a2 == -1)? "NIL" : a2) + " ");
+    	output.print(((a3 == -1)? "NIL" : a3));
+    	output.println();   	
+    	
+    }
+    
+    
+    
 
     public void print(Node tree, int level) {
         if (tree.right != nil)
@@ -310,6 +385,8 @@ class BST {
         }
     }
     
+        
+    
     int black_height () {
         int level = 0;
         Node n = root;
@@ -339,22 +416,28 @@ class BST {
 }
 
 public class DataStructure {
-    public static void main(String [] args) throws IOException {
-    	File dir = new File("./input/");
-    	File[] fileList = dir.listFiles();
+    @SuppressWarnings("resource")
+	public static void main(String [] args) throws IOException {
+    	File inputs = new File("./input/");
+    	File[] fileList1 = inputs.listFiles();
+    	// input 폴더에서 불러옴
+    	File searchs = new File("./search/");
+    	File[] fileList2 = searchs.listFiles();
+    	// search 폴더에서 불러옴
+    	BST[] storeBST = new BST[100];
+    
     	
     	try{
-    		for (int i = 0; i < fileList.length; i++){
-    			File file = fileList[i];
+    		for (int i = 0; i < fileList1.length; i++){
+    			File file = fileList1[i];
     			if (file.isFile()){
-    				System.out.println("filename = " + file.getName());
     		        BufferedReader br = new BufferedReader(new FileReader(file));
     		        BST bst = new BST();
     		        int l;
     		        while (true) {
     		            String line = br.readLine();
-    		            line = onlyNum(line);
-    		            l = Integer.parseInt(line);
+    		            line = onlyNum(line);   // string에서 띄어쓰기 등 불필요한 구문 삭제
+    		            l = Integer.parseInt(line); // string을 int로 변환
     		            if (l > 0)
     		                bst.insert(bst.root, l);
     		            else if (l < 0){
@@ -364,20 +447,55 @@ public class DataStructure {
     		            else if (l == 0)
     		                break;
     		        }
-    		        bst.numbering(bst.root);
+    		        
+    		        bst.numbering(bst.root);   		        		   
+        //  HW #5    		        
+    		      //  System.out.println("total = " + bst.total);
+    		      //  System.out.println("insert = " + bst.hit);
+    		      //  System.out.println("deleted = " + bst.delete);
+    		      //  System.out.println("miss = " + bst.miss);
+    		      //  System.out.println("nb = " + bst.nb);
+    		      //  System.out.println("bh = " + bst.black_height());
+    		      //  bst.print(bst.root,0);
+    		      //  System.out.println();
 
-    		        System.out.println("total = " + bst.total);
-    		        System.out.println("insert = " + bst.hit);
-    		        System.out.println("deleted = " + bst.delete);
-    		        System.out.println("miss = " + bst.miss);
-    		        System.out.println("nb = " + bst.nb);
-    		        System.out.println("bh = " + bst.black_height());
-    		        bst.inorder(bst.root);
-    		        System.out.println();
-    			}
-    		}
+    		        storeBST[i] = bst;
+    			}    			
+    		}   		
     	} catch(IOException e){    	
     	}
+    	
+    	
+
+        //  HW #6 (final homework)
+    	try{
+    		for (int i = 0; i < fileList2.length; i++){
+    			File file = fileList2[i];
+    			File output_txt = new File("./output/output" + String.format("%02d", i+1) + ".txt");
+    			//output 폴더에 결과값을 저장
+    			PrintWriter output = new PrintWriter(output_txt);
+    			
+    			if (file.isFile()){
+    		        BufferedReader br = new BufferedReader(new FileReader(file));
+    		        BST bst = storeBST[i];
+    		        int l;
+    		        while (true) {
+    		            String line = br.readLine();
+    		            line = onlyNum(line); 
+    		            l = Integer.parseInt(line);
+    		            if (l != 0)
+    		            	bst.search_three(bst.root, l, output);
+    		            else
+    		                break;
+    		        }
+    		        output.close();
+    			}    			
+    		}
+    		
+    		
+    	} catch(IOException e){    	
+    	}
+    	
 
     }
 
